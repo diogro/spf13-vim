@@ -3,6 +3,9 @@ colorscheme ir_black
 " No spell a não ser que seja latex
 set nospell
 
+" Using Par for formatting"
+set formatprg=par\ -w72re
+
 " fold method padrão"
 set foldmethod=syntax
 
