@@ -1,0 +1,8 @@
+Bundle 'spf13/vim-colors'
+Bundle 'sjl/gundo.vim'
+Bundle 'JuliaLang/julia-vim'
+Bundle 'vim-scripts/pep8'
+Bundle 'vim-scripts/TaskList.vim'
+Bundle 'vim-scripts/Vim-R-plugin'
+Bundle 'jalvesaq/VimCom'
+Bundle 'vim-scripts/VisIncr'
