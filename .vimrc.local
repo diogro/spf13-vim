@@ -1,10 +1,32 @@
 colorscheme ir_black
 
+" espaços virtuais
+set virtualedit=all
+
+" padrão costuma ser bash
+set shell=/bin/zsh
+
+" change com limites
+set cpoptions+=$
+
+" Abrindo a lista de revisao
+map <leader>g :GundoToggle<CR>CR
+
+" Highlight de linhas maiores que 80 chars
+autocmd FileType python highlight OverLength ctermbg=red ctermfg=white guibg=#592929
+autocmd FileType python match OverLength /\%81v.\+/
+
 " Alguns atalhos simples.
 ab #i #include <>
 ab #d #define
 ab #f for(;;){}
 ab #w while(){}
+
+" Atalho pra \(\), coloca o cursor dentro do agrupador
+cmap ;\ \(\)<Left><Left>
+
+" Atalho pra substituição global, coloca o cursor dentro do agrupador
+cmap ;; %s:::g<Left><Left><Left>
 
 " Arrow key remapping: Up/Dn = move line up/dn; Left/Right = indent/unindent
 function! DelEmptyLineAbove()
