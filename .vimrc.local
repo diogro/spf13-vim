@@ -1,5 +1,11 @@
 colorscheme ir_black
 
+" No spell a não ser que seja latex
+set nospell
+
+" fold method padrão"
+set foldmethod=syntax
+
 " espaços virtuais
 set virtualedit=all
 
