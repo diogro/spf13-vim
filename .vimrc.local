@@ -1,5 +1,10 @@
 colorscheme ir_black
 
+" Centralizando a tela..."
+nmap <space> zz
+nmap n nzz
+nmap N Nzz
+
 " No spell a não ser que seja latex
 set nospell
 
