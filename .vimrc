@@ -18,13 +18,6 @@
 " Environment {
     " Basics {
         set nocompatible        " must be first line
-        if has ("unix") && "Darwin" != system("echo -n \"$(uname)\"")
-          " on Linux use + register for copy-paste
-          set clipboard=unnamedplus
-        else
-          " one mac and windows, use * register for copy-paste
-          set clipboard=unnamed
-        endif
     " }
 
     " Windows Compatible {
@@ -33,14 +26,6 @@
         if has('win32') || has('win64')
           set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
         endif
-    " }
-
-    " Filetype Workarounds {
-        " Temporary workaround to Better-CSS-Syntax-for-Vim
-        " See https://github.com/ChrisYip/Better-CSS-Syntax-for-Vim/issues/9
-        " for more information
-        autocmd BufNewFile,BufRead *.scss set filetype=css
-        autocmd BufNewFile,BufRead *.sass set filetype=css
     " }
 
     " Setup Bundle Support {
@@ -79,7 +64,14 @@
     filetype plugin indent on   " Automatically detect file types.
     syntax on                   " syntax highlighting
     set mouse=a                 " automatically enable mouse usage
+    set mousehide               " hide the mouse cursor while typing
     scriptencoding utf-8
+
+    if has ('x') && has ('gui') " on Linux use + register for copy-paste
+        set clipboard=unnamedplus
+    elseif has ('gui') " one mac and windows, use * register for copy-paste
+        set clipboard=unnamed
+    endif
 
     " Most prefer to automatically switch to the current file directory when
     " a new buffer is opened; to prevent this behavior, add
@@ -109,9 +101,11 @@
     " g:spf13_no_views = 1
     " in your .vimrc.bundles.local file"
     if !exists('g:spf13_no_views')
-        " Could use * rather than *.*, but I prefer to leave .files unsaved
-        au BufWinLeave *.* silent! mkview  "make vim save view (state) (folds, cursor, etc)
-        au BufWinEnter *.* silent! loadview "make vim load view (state) (folds, cursor, etc)
+        " Add exclusions to mkview and loadview
+        " eg: *.*, svn-commit.tmp
+        let g:skipview_files = [
+            \ '\[example pattern\]'
+            \ ]
     endif
     " }
 " }
@@ -180,7 +174,7 @@
     set pastetoggle=<F12>           " pastetoggle (sane indentation on pastes)
     "set comments=sl:/*,mb:*,elx:*/  " auto format comment blocks
     " Remove trailing whitespaces and ^M chars
-    autocmd FileType c,cpp,java,php,javascript,python,twig,xml,yml autocmd BufWritePre <buffer> :call setline(1,map(getline(1,"$"),'substitute(v:val,"\\s\\+$","","")'))
+    autocmd FileType c,cpp,java,php,javascript,python,twig,xml,yml autocmd BufWritePre <buffer> call StripTrailingWhitespace()
     autocmd BufNewFile,BufRead *.html.twig set filetype=html.twig
 " }
 
@@ -247,8 +241,8 @@
     nmap <leader>f8 :set foldlevel=8<CR>
     nmap <leader>f9 :set foldlevel=9<CR>
 
-    "clearing highlighted search
-    nmap <silent> <leader>/ :nohlsearch<CR>
+    " Toggle search highlighting
+    nmap <silent> <leader>/ :set invhlsearch<CR>
 
     " Shortcuts
     " Change Working Directory to that of the current file
@@ -279,6 +273,10 @@
 
     " Adjust viewports to the same size
     map <Leader>= <C-w>=
+
+    " map <Leader>ff to display all lines with keyword under cursor
+    " and ask which one to jump to
+    nmap <Leader>ff [I:let nr = input("Which one: ")<Bar>exe "normal " . nr ."[\t"<CR>
 
     " Easier horizontal scrolling
     map zl zL
@@ -354,6 +352,8 @@
     " }
 
     " Tabularize {
+        nmap <Leader>a& :Tabularize /&<CR>
+        vmap <Leader>a& :Tabularize /&<CR>
         nmap <Leader>a= :Tabularize /=<CR>
         vmap <Leader>a= :Tabularize /=<CR>
         nmap <Leader>a: :Tabularize /:<CR>
@@ -382,6 +382,7 @@
 
      " PyMode {
         let g:pymode_lint_checker = "pyflakes"
+        let g:pymode_utils_whitespaces = 0
      " }
 
      " ctrlp {
@@ -391,6 +392,14 @@
         let g:ctrlp_custom_ignore = {
             \ 'dir':  '\.git$\|\.hg$\|\.svn$',
             \ 'file': '\.exe$\|\.so$\|\.dll$' }
+
+        let g:ctrlp_user_command = {
+            \ 'types': {
+                \ 1: ['.git', 'cd %s && git ls-files'],
+                \ 2: ['.hg', 'hg --cwd %s locate -I .'],
+            \ },
+            \ 'fallback': 'find %s -type f'
+        \ }
      "}
 
      " TagBar {
@@ -414,52 +423,53 @@
      "}
 
      " neocomplcache {
+        let g:acp_enableAtStartup = 0
         let g:neocomplcache_enable_at_startup = 1
         let g:neocomplcache_enable_camel_case_completion = 1
         let g:neocomplcache_enable_smart_case = 1
         let g:neocomplcache_enable_underbar_completion = 1
-        let g:neocomplcache_min_syntax_length = 3
         let g:neocomplcache_enable_auto_delimiter = 1
         let g:neocomplcache_max_list = 15
-        let g:neocomplcache_auto_completion_start_length = 3
         let g:neocomplcache_force_overwrite_completefunc = 1
-        let g:neocomplcache_snippets_dir='~/.vim/bundle/snipmate-snippets/snippets'
-
-        " AutoComplPop like behavior.
-        let g:neocomplcache_enable_auto_select = 0
 
         " SuperTab like snippets behavior.
-        imap  <silent><expr><tab>  neocomplcache#sources#snippets_complete#expandable() ? "\<plug>(neocomplcache_snippets_expand)" : (pumvisible() ? "\<c-e>" : "\<tab>")
-        smap  <tab>  <right><plug>(neocomplcache_snippets_jump) 
+        imap <silent><expr><TAB> neosnippet#expandable() ?
+            \ "\<Plug>(neosnippet_expand_or_jump)" : (pumvisible() ?
+            \ "\<C-e>" : "\<TAB>")
+        smap <TAB> <Right><Plug>(neosnippet_jump_or_expand)
+
+        " Define dictionary.
+        let g:neocomplcache_dictionary_filetype_lists = {
+            \ 'default' : '',
+            \ 'vimshell' : $HOME.'/.vimshell_hist',
+            \ 'scheme' : $HOME.'/.gosh_completions'
+            \ }
+
+        " Define keyword.
+        if !exists('g:neocomplcache_keyword_patterns')
+            let g:neocomplcache_keyword_patterns = {}
+        endif
+        let g:neocomplcache_keyword_patterns._ = '\h\w*'
 
         " Plugin key-mappings.
-        " Ctrl-k expands snippet & moves to next position
-        " <CR> chooses highlighted value
-        imap <C-k>     <Plug>(neocomplcache_snippets_expand)
-        smap <C-k>     <Plug>(neocomplcache_snippets_expand)
-        inoremap <expr><C-g>   neocomplcache#undo_completion()
-        inoremap <expr><C-l>   neocomplcache#complete_common_string()
-        inoremap <expr><CR>    neocomplcache#complete_common_string()
+        imap <C-k> <Plug>(neosnippet_expand_or_jump)
+        smap <C-k> <Plug>(neosnippet_expand_or_jump)
+        inoremap <expr><C-g> neocomplcache#undo_completion()
+        inoremap <expr><C-l> neocomplcache#complete_common_string()
+        inoremap <expr><CR> neocomplcache#complete_common_string()
 
+        " <TAB>: completion.
+        inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+        inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<TAB>"
 
         " <CR>: close popup
         " <s-CR>: close popup and save indent.
         inoremap <expr><s-CR> pumvisible() ? neocomplcache#close_popup()"\<CR>" : "\<CR>"
-        inoremap <expr><CR>  pumvisible() ? neocomplcache#close_popup() : "\<CR>"
-
-        " <TAB>: completion.
-        inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-        inoremap <expr><s-TAB>  pumvisible() ? "\<C-p>" : "\<TAB>"
+        inoremap <expr><CR> pumvisible() ? neocomplcache#close_popup() : "\<CR>"
 
         " <C-h>, <BS>: close popup and delete backword char.
         inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
-        inoremap <expr><C-y>  neocomplcache#close_popup()
-
-        " Define keyword.
-        if !exists('g:neocomplcache_keyword_patterns')
-          let g:neocomplcache_keyword_patterns = {}
-        endif
-        let g:neocomplcache_keyword_patterns['default'] = '\h\w*'
+        inoremap <expr><C-y> neocomplcache#close_popup()
 
         " Enable omni completion.
         autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
@@ -473,20 +483,24 @@
         if !exists('g:neocomplcache_omni_patterns')
             let g:neocomplcache_omni_patterns = {}
         endif
-        let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\h\w*\|\h\w*::'
         let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
-        let g:neocomplcache_omni_patterns.c = '\%(\.\|->\)\h\w*'
-        let g:neocomplcache_omni_patterns.cpp = '\h\w*\%(\.\|->\)\h\w*\|\h\w*::'
+        let g:neocomplcache_omni_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
+        let g:neocomplcache_omni_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
+        let g:neocomplcache_omni_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
+        let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\h\w*\|\h\w*::'
+
+        " use honza's snippets
+        let g:neosnippet#snippets_directory='~/.vim/bundle/snipmate-snippets/snippets'
 
         " For snippet_complete marker.
         if has('conceal')
             set conceallevel=2 concealcursor=i
         endif
-
      " }
 
      " UndoTree {
         nnoremap <Leader>u :UndotreeToggle<CR>
+        let g:undotree_SetFocusWhenToggle=1 " if undotree is opened, it is likely one wants to interact with it.
      " }
 
      " indent_guides {
@@ -527,6 +541,14 @@
 " }
 
  " Functions {
+
+function! UnBundle(arg, ...)
+  let bundle = vundle#config#init_bundle(a:arg, a:000)
+  call filter(g:bundles, 'v:val["name_spec"] != "' . a:arg . '"')
+endfunction
+
+com! -nargs=+         UnBundle
+\ call UnBundle(<args>)
 
 function! InitializeDirectories()
     let separator = "."
@@ -570,6 +592,25 @@ function! NERDTreeInitAsNeeded()
         wincmd l
     endif
 endfunction
+
+" Strip whitespace
+function! StripTrailingWhitespace()
+    " To disable the stripping of whitespace, add the following to your
+    " .vimrc.local file:
+    "   let g:spf13_keep_trailing_whitespace = 1
+    if !exists('g:spf13_keep_trailing_whitespace')
+        " Preparation: save last search, and cursor position.
+        let _s=@/
+        let l = line(".")
+        let c = col(".")
+        " do the business:
+        %s/\s\+$//e
+        " clean up: restore previous search history, and cursor position
+        let @/=_s
+        call cursor(l, c)
+    endif
+endfunction
+
 " }
 
 " Use fork vimrc if available {
@@ -577,6 +618,7 @@ endfunction
         source ~/.vimrc.fork
     endif
 " }
+
 " Use local vimrc if available {
     if filereadable(expand("~/.vimrc.local"))
         source ~/.vimrc.local
