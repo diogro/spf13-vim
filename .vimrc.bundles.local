@@ -10,3 +10,5 @@ Bundle 'vim-scripts/Screen-vim---gnu-screentmux'
 Bundle 'majutsushi/tagbar'
 Bundle 'vim-pandoc/vim-pandoc'
 Bundle 'vim-scripts/LanguageTool'
+Bundle 'vim-scripts/sudo.vim'
+

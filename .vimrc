@@ -131,6 +131,9 @@
 
     set cursorline                  " Highlight current line
 
+    highlight clear SignColumn      " SignColumn should match background for
+                                    " things like vim-gitgutter
+
     if has('cmdline_info')
         set ruler                   " Show the ruler
         set rulerformat=%30(%=\:b%n%y%m%r%w\ %l,%c%V\ %P%) " A ruler on steroids
@@ -166,7 +169,7 @@
     set scrolloff=3                 " Minimum lines to keep above and below cursor
     set foldenable                  " Auto fold code
     set list
-    set listchars=tab:,.,trail:.,extends:#,nbsp:. " Highlight problematic whitespace
+    set listchars=tab:›\ ,trail:•,extends:#,nbsp:. " Highlight problematic whitespace
 
 " }
 
@@ -182,7 +185,8 @@
     set pastetoggle=<F12>           " pastetoggle (sane indentation on pastes)
     "set comments=sl:/*,mb:*,elx:*/  " auto format comment blocks
     " Remove trailing whitespaces and ^M chars
-    autocmd FileType c,cpp,java,php,javascript,python,twig,xml,yml autocmd BufWritePre <buffer> call StripTrailingWhitespace()
+    autocmd FileType c,cpp,java,go,php,javascript,python,twig,xml,yml autocmd BufWritePre <buffer> call StripTrailingWhitespace()
+    autocmd FileType go autocmd BufWritePre <buffer> Fmt
     autocmd BufNewFile,BufRead *.html.twig set filetype=html.twig
 
 " }
@@ -200,10 +204,16 @@
     endif
 
     " Easier moving in tabs and windows
-    map <C-J> <C-W>j<C-W>_
-    map <C-K> <C-W>k<C-W>_
-    map <C-L> <C-W>l<C-W>_
-    map <C-H> <C-W>h<C-W>_
+    " The lines conflict with the default digraph mapping of <C-K>
+    " If you prefer that functionality, add let g:spf13_no_easyWindows = 1
+    " in your .vimrc.bundles.local file
+
+    if !exists('g:spf13_no_easyWindows')
+        map <C-J> <C-W>j<C-W>_
+        map <C-K> <C-W>k<C-W>_
+        map <C-L> <C-W>l<C-W>_
+        map <C-H> <C-W>h<C-W>_
+    endif
 
     " Wrapped lines goes down/up to next row, rather than next line in file.
     nnoremap j gj
@@ -383,10 +393,6 @@
         nmap <leader>ss :SessionSave<CR>
     " }
 
-    " Buffer explorer {
-        nmap <leader>b :BufExplorer<CR>
-    " }
-
     " JSON {
         nmap <leader>jt <Esc>:%!python -m json.tool<CR><Esc>:set filetype=json<CR>
     " }
@@ -394,19 +400,20 @@
     " PyMode {
         let g:pymode_lint_checker = "pyflakes"
         let g:pymode_utils_whitespaces = 0
+        let g:pymode_options = 0
     " }
 
     " ctrlp {
-        let g:ctrlp_working_path_mode = 2
+        let g:ctrlp_working_path_mode = 'ra'
         nnoremap <silent> <D-t> :CtrlP<CR>
         nnoremap <silent> <D-r> :CtrlPMRU<CR>
         let g:ctrlp_custom_ignore = {
             \ 'dir':  '\.git$\|\.hg$\|\.svn$',
-            \ 'file': '\.exe$\|\.so$\|\.dll$' }
+            \ 'file': '\.exe$\|\.so$\|\.dll$\|\.pyc$' }
 
         let g:ctrlp_user_command = {
             \ 'types': {
-                \ 1: ['.git', 'cd %s && git ls-files'],
+                \ 1: ['.git', 'cd %s && git ls-files . --cached --exclude-standard --others'],
                 \ 2: ['.hg', 'hg --cwd %s locate -I .'],
             \ },
             \ 'fallback': 'find %s -type f'
@@ -415,6 +422,21 @@
 
     " TagBar {
         nnoremap <silent> <leader>tt :TagbarToggle<CR>
+
+        " If using go please install the gotags program using the following
+        " go install github.com/jstemmer/gotags
+        " And make sure gotags is in your path
+        let g:tagbar_type_go = {
+            \ 'ctagstype' : 'go',
+            \ 'kinds'     : [  'p:package', 'i:imports:1', 'c:constants', 'v:variables',
+                \ 't:types',  'n:interfaces', 'w:fields', 'e:embedded', 'm:methods',
+                \ 'r:constructor', 'f:functions' ],
+            \ 'sro' : '.',
+            \ 'kind2scope' : { 't' : 'ctype', 'n' : 'ntype' },
+            \ 'scope2kind' : { 'ctype' : 't', 'ntype' : 'n' },
+            \ 'ctagsbin'  : 'gotags',
+            \ 'ctagsargs' : '-sort -silent'
+            \ }
     "}
 
     " PythonMode {
@@ -431,81 +453,102 @@
         nnoremap <silent> <leader>gb :Gblame<CR>
         nnoremap <silent> <leader>gl :Glog<CR>
         nnoremap <silent> <leader>gp :Git push<CR>
+        nnoremap <silent> <leader>gw :Gwrite<CR>:GitGutter<CR>
+        nnoremap <silent> <leader>gg :GitGutterToggle<CR>
     "}
 
     " neocomplcache {
-        let g:acp_enableAtStartup = 0
-        let g:neocomplcache_enable_at_startup = 1
-        let g:neocomplcache_enable_camel_case_completion = 1
-        let g:neocomplcache_enable_smart_case = 1
-        let g:neocomplcache_enable_underbar_completion = 1
-        let g:neocomplcache_enable_auto_delimiter = 1
-        let g:neocomplcache_max_list = 15
-        let g:neocomplcache_force_overwrite_completefunc = 1
+        if count(g:spf13_bundle_groups, 'neocomplcache')
+            let g:acp_enableAtStartup = 0
+            let g:neocomplcache_enable_at_startup = 1
+            let g:neocomplcache_enable_camel_case_completion = 1
+            let g:neocomplcache_enable_smart_case = 1
+            let g:neocomplcache_enable_underbar_completion = 1
+            let g:neocomplcache_enable_auto_delimiter = 1
+            let g:neocomplcache_max_list = 15
+            let g:neocomplcache_force_overwrite_completefunc = 1
 
-        " SuperTab like snippets behavior.
-        imap <silent><expr><TAB> neosnippet#expandable() ?
-                    \ "\<Plug>(neosnippet_expand_or_jump)" : (pumvisible() ?
-                    \ "\<C-e>" : "\<TAB>")
-        smap <TAB> <Right><Plug>(neosnippet_jump_or_expand)
+            " SuperTab like snippets behavior.
+            imap <silent><expr><TAB> neosnippet#expandable() ?
+                        \ "\<Plug>(neosnippet_expand_or_jump)" : (pumvisible() ?
+                        \ "\<C-e>" : "\<TAB>")
+            smap <TAB> <Right><Plug>(neosnippet_jump_or_expand)
 
-        " Define dictionary.
-        let g:neocomplcache_dictionary_filetype_lists = {
-                    \ 'default' : '',
-                    \ 'vimshell' : $HOME.'/.vimshell_hist',
-                    \ 'scheme' : $HOME.'/.gosh_completions'
-                    \ }
+            " Define dictionary.
+            let g:neocomplcache_dictionary_filetype_lists = {
+                        \ 'default' : '',
+                        \ 'vimshell' : $HOME.'/.vimshell_hist',
+                        \ 'scheme' : $HOME.'/.gosh_completions'
+                        \ }
 
-        " Define keyword.
-        if !exists('g:neocomplcache_keyword_patterns')
-            let g:neocomplcache_keyword_patterns = {}
-        endif
-        let g:neocomplcache_keyword_patterns._ = '\h\w*'
+            " Define keyword.
+            if !exists('g:neocomplcache_keyword_patterns')
+                let g:neocomplcache_keyword_patterns = {}
+            endif
+            let g:neocomplcache_keyword_patterns._ = '\h\w*'
 
-        " Plugin key-mappings.
-        imap <C-k> <Plug>(neosnippet_expand_or_jump)
-        smap <C-k> <Plug>(neosnippet_expand_or_jump)
-        inoremap <expr><C-g> neocomplcache#undo_completion()
-        inoremap <expr><C-l> neocomplcache#complete_common_string()
-        inoremap <expr><CR> neocomplcache#complete_common_string()
+            " Plugin key-mappings.
 
-        " <TAB>: completion.
-        inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
-        inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<TAB>"
+            " These two lines conflict with the default digraph mapping of <C-K>
+            " If you prefer that functionality, add
+            " let g:spf13_no_neosnippet_expand = 1
+            " in your .vimrc.bundles.local file
 
-        " <CR>: close popup
-        " <s-CR>: close popup and save indent.
-        inoremap <expr><s-CR> pumvisible() ? neocomplcache#close_popup()"\<CR>" : "\<CR>"
-        inoremap <expr><CR> pumvisible() ? neocomplcache#close_popup() : "\<CR>"
+            if !exists('g:spf13_no_neosnippet_expand')
+                imap <C-k> <Plug>(neosnippet_expand_or_jump)
+                smap <C-k> <Plug>(neosnippet_expand_or_jump)
+            endif
 
-        " <C-h>, <BS>: close popup and delete backword char.
-        inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
-        inoremap <expr><C-y> neocomplcache#close_popup()
+            inoremap <expr><C-g> neocomplcache#undo_completion()
+            inoremap <expr><C-l> neocomplcache#complete_common_string()
+            inoremap <expr><CR> neocomplcache#complete_common_string()
 
-        " Enable omni completion.
-        autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-        autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-        autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-        autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-        autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-        autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
+            " <TAB>: completion.
+            inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+            inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<TAB>"
 
-        " Enable heavy omni completion.
-        if !exists('g:neocomplcache_omni_patterns')
-            let g:neocomplcache_omni_patterns = {}
-        endif
-        let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
-        let g:neocomplcache_omni_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
-        let g:neocomplcache_omni_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
-        let g:neocomplcache_omni_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
-        let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\h\w*\|\h\w*::'
+            " <CR>: close popup
+            " <s-CR>: close popup and save indent.
+            inoremap <expr><s-CR> pumvisible() ? neocomplcache#close_popup()"\<CR>" : "\<CR>"
+            inoremap <expr><CR> pumvisible() ? neocomplcache#close_popup() : "\<CR>"
 
-        " Use honza's snippets.
-        let g:neosnippet#snippets_directory='~/.vim/bundle/snipmate-snippets/snippets'
+            " <C-h>, <BS>: close popup and delete backword char.
+            inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
+            inoremap <expr><C-y> neocomplcache#close_popup()
 
-        " For snippet_complete marker.
-        if has('conceal')
-            set conceallevel=2 concealcursor=i
+            " Enable omni completion.
+            autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+            autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+            autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+            autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+            autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+            autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
+
+            " Enable heavy omni completion.
+            if !exists('g:neocomplcache_omni_patterns')
+                let g:neocomplcache_omni_patterns = {}
+            endif
+            let g:neocomplcache_omni_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
+            let g:neocomplcache_omni_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
+            let g:neocomplcache_omni_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
+            let g:neocomplcache_omni_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
+            let g:neocomplcache_omni_patterns.ruby = '[^. *\t]\.\h\w*\|\h\w*::'
+
+            " Use honza's snippets.
+            let g:neosnippet#snippets_directory='~/.vim/bundle/vim-snippets/snippets'
+
+            " Enable neosnippet snipmate compatibility mode
+            let g:neosnippet#enable_snipmate_compatibility = 1
+
+            " For snippet_complete marker.
+            if has('conceal')
+                set conceallevel=2 concealcursor=i
+            endif
+
+            " Disable the neosnippet preview candidate window
+            " When enabled, there can be too much visual noise
+            " especially when splits are used.
+            set completeopt-=preview
         endif
     " }
 
@@ -519,11 +562,10 @@
         if !exists('g:spf13_no_indent_guides_autocolor')
             let g:indent_guides_auto_colors = 1
         else
-            " For some colorscheme, autocolor will not work, like 'desert', 'ir_black'.
-            autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=#212121   ctermbg=3
+            " For some colorschemes, autocolor will not work (eg: 'desert', 'ir_black')
+            autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=#212121 ctermbg=3
             autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=#404040 ctermbg=4
         endif
-        set ts=4 sw=4 et
         let g:indent_guides_start_level = 2
         let g:indent_guides_guide_size = 1
         let g:indent_guides_enable_on_vim_startup = 1
@@ -536,18 +578,20 @@
     " GVIM- (here instead of .gvimrc)
     if has('gui_running')
         set guioptions-=T           " Remove the toolbar
-        set lines=40                " 40 lines of text instead of 24,
+        set lines=40                " 40 lines of text instead of 24
         if has("gui_gtk2")
             set guifont=Andale\ Mono\ Regular\ 16,Menlo\ Regular\ 15,Consolas\ Regular\ 16,Courier\ New\ Regular\ 18
-        else
+        elseif has("gui_mac")
             set guifont=Andale\ Mono\ Regular:h16,Menlo\ Regular:h15,Consolas\ Regular:h16,Courier\ New\ Regular:h18
+        elseif has("gui_win32")
+            set guifont=Andale_Mono:h10,Menlo:h10,Consolas:h10,Courier_New:h10
         endif
         if has('gui_macvim')
-            set transparency=5          " Make the window slightly transparent
+            set transparency=5      " Make the window slightly transparent
         endif
     else
         if &term == 'xterm' || &term == 'screen'
-            set t_Co=256                 " Enable 256 colors to stop the CSApprox warning and make xterm vim shine
+            set t_Co=256            " Enable 256 colors to stop the CSApprox warning and make xterm vim shine
         endif
         "set term=builtin_ansi       " Make arrow and other keys work
     endif

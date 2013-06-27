@@ -30,9 +30,9 @@ map <leader>g :GundoToggle<CR>CR
 "let vimrplugin_screenvsplit = 1
 "let g:ScreenImpl = 'Tmux'
 
-" Highlight de linhas maiores que 80 chars
-autocmd FileType python highlight OverLength ctermbg=red ctermfg=white guibg=#592929
-autocmd FileType python match OverLength /\%81v.\+/
+ "Highlight de linhas maiores que 80 chars
+"autocmd FileType python highlight OverLength ctermbg=red ctermfg=white guibg=#592929
+"autocmd FileType python match OverLength /\%81v.\+/
 
 " Alguns atalhos simples.
 ab #i #include <>
