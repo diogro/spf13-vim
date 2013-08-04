@@ -26,9 +26,13 @@ set cpoptions+=$
 " Abrindo a lista de revisao
 map <leader>g :GundoToggle<CR>CR
 
-" Highlight de linhas maiores que 80 chars
-autocmd FileType python highlight OverLength ctermbg=red ctermfg=white guibg=#592929
-autocmd FileType python match OverLength /\%81v.\+/
+ "vertical split no R plugin
+"let vimrplugin_screenvsplit = 1
+"let g:ScreenImpl = 'Tmux'
+
+ "Highlight de linhas maiores que 80 chars
+"autocmd FileType python highlight OverLength ctermbg=red ctermfg=white guibg=#592929
+"autocmd FileType python match OverLength /\%81v.\+/
 
 " Alguns atalhos simples.
 ab #i #include <>
@@ -41,6 +45,12 @@ cmap ;\ \(\)<Left><Left>
 
 " Atalho pra substituição global, coloca o cursor dentro do agrupador
 cmap ;; %s:::g<Left><Left><Left>
+
+" Path da bibliografia pro pandoc ter auto complete
+let g:pandoc_bibfiles = '/home/diogro/Dropbox/Mendeley/library.bib'
+
+" Path do language tool
+let g:languagetool_jar = '/home/diogro/.bin/languagetool/LanguageTool.jar'
 
 " Strip trailing spaces throughout an entire file "
 function! <SID>StripTrailingWhitespaces()
