@@ -159,3 +159,4 @@ endfunction
 
 nnoremap <leader>s :<C-U>exec "normal i".RepeatChar(nr2char(getchar()), v:count1)<cr>
 nnoremap <leader>S :<C-U>exec "normal a".RepeatChar(nr2char(getchar()), v:count1)<cr>
+UnBundle 'tpope/vim-markdown'
