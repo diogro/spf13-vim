@@ -2,5 +2,6 @@
 *.pyc
 *._*
 .vim/bundle
+.vim/sessions/
 .vim/spell
 .vim/*
