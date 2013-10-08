@@ -3,4 +3,6 @@
 *._*
 .vim/bundle
 .vim/spell/*
+.vim/sessions/
+.vim/spell
 .vim/*
