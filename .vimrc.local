@@ -50,7 +50,7 @@ cmap ;\ \(\)<Left><Left>
 cmap ;; %s:::g<Left><Left><Left>
 
 " Path da bibliografia pro pandoc ter auto complete
-let g:pandoc_bibfiles = '/home/diogro/Dropbox/Mendeley/library.bib'
+"let g:pandoc_bibfiles = '/home/diogro/Dropbox/Mendeley/library.bib'
 
 " Path do language tool
 let g:languagetool_jar = '/home/diogro/.bin/languagetool/LanguageTool.jar'
@@ -162,4 +162,3 @@ endfunction
 
 nnoremap <leader>s :<C-U>exec "normal i".RepeatChar(nr2char(getchar()), v:count1)<cr>
 nnoremap <leader>S :<C-U>exec "normal a".RepeatChar(nr2char(getchar()), v:count1)<cr>
-UnBundle 'tpope/vim-markdown'
