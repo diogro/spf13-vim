@@ -31,7 +31,7 @@ map <leader>g :GundoToggle<CR>CR
 
  "vertical split no R plugin
 "let vimrplugin_screenvsplit = 1
-"let g:ScreenImpl = 'Tmux'
+let g:ScreenImpl = 'Tmux'
 
  "Highlight de linhas maiores que 80 chars
 autocmd FileType python highlight OverLength ctermbg=red ctermfg=white guibg=#592929
