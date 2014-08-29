@@ -8,6 +8,15 @@ nmap N Nzz
 "Desligando a merda do _  = <-"
 let vimrplugin_assign = 0
 
+"Folding do R"
+let r_syntax_folding = 1
+
+"Comeca com folds abertos"
+set nofoldenable
+
+"vim-r-em tudo!"
+source /home/diogro/.vim/bundle/Vim-R-plugin/r-plugin/global_r_plugin.vim
+
 "Testando usar o espaço pra mandar as paradas
 vmap <Space> <Plug>RDSendSelection
 nmap <Space> <Plug>RDSendLine
