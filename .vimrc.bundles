@@ -62,7 +62,7 @@
     " Add an UnBundle command {
     function! UnBundle(arg, ...)
       let bundle = vundle#config#init_bundle(a:arg, a:000)
-      call filter(g:bundles, 'v:val["name_spec"] != "' . a:arg . '"')
+      call filter(g:vundle#bundles, 'v:val["name_spec"] != "' . a:arg . '"')
     endfunction
 
     com! -nargs=+         UnBundle
@@ -107,9 +107,9 @@
             Bundle 'tpope/vim-surround'
             Bundle 'tpope/vim-repeat'
             Bundle 'spf13/vim-autoclose'
-            Bundle 'kien/ctrlp.vim'
+            Bundle 'ctrlpvim/ctrlp.vim'
             Bundle 'tacahiroy/ctrlp-funky'
-            Bundle 'terryma/vim-multiple-cursors'
+            Bundle 'kristijanhusak/vim-multiple-cursors'
             Bundle 'vim-scripts/sessionman.vim'
             Bundle 'matchit.zip'
             if (has("python") || has("python3")) && exists('g:spf13_use_powerline') && !exists('g:spf13_use_old_powerline')
@@ -256,6 +256,12 @@
         endif
     " }
 
+    " Puppet {
+        if count(g:spf13_bundle_groups, 'puppet')
+            Bundle 'rodjek/vim-puppet'
+        endif
+    " }
+
     " Go Lang {
         if count(g:spf13_bundle_groups, 'go')
             "Bundle 'Blackrush/vim-gocode'
@@ -263,15 +269,22 @@
         endif
     " }
 
+    " Elixir {
+        if count(g:spf13_bundle_groups, 'elixir')
+            Bundle 'elixir-lang/vim-elixir'
+            Bundle 'carlosgaldino/elixir-snippets'
+            Bundle 'mattreduce/vim-mix'
+        endif
+    " }
+
     " Misc {
         if count(g:spf13_bundle_groups, 'misc')
-            Bundle 'wting/rust.vim'
+            Bundle 'rust-lang/rust.vim'
             Bundle 'tpope/vim-markdown'
             Bundle 'spf13/vim-preview'
             Bundle 'tpope/vim-cucumber'
             Bundle 'cespare/vim-toml'
             Bundle 'quentindecock/vim-cucumber-align-pipes'
-            Bundle 'Puppet-Syntax-Highlighting'
             Bundle 'saltstack/salt-vim'
         endif
     " }

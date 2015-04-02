@@ -42,15 +42,12 @@ If you have a bash-compatible shell you can run the script directly:
 
 ## Installing on Windows
 
-On Windows and \*nix [Git] and [Curl] are required. Also, if you haven't already, you'll need to install [Vim].  
-The quickest option to install all three dependencies ([Git], [Curl], [Vim] and [spf13-vim]) via [Chocolatey] NuGet and the [spf13.vim package]. After running the [Chocolatey] install, execute the following commands on the _command prompt_:
+On Windows and \*nix [Git] and [Curl] are required. Also, if you haven't done so already, you'll need to install [Vim].  
+The quickest option to install all three dependencies ([Git], [Curl], [Vim] and [spf13-vim]) is via [Chocolatey] NuGet. After installing [Chocolatey], execute the following commands on the _command prompt_:
 
-    cinst git
-    cinst curl
-    cinst ctags
-    cinst spf13.vim
+    C:\> choco install spf13-vim
 
-_Note: The spf13.vim package will install Vim also! _
+_Note: The [spf13-vim package] will install Vim also!_
 
 If you want to install [msysgit], [Curl] and [spf13-vim] individually, follow the directions below.
 
@@ -196,7 +193,7 @@ needs to be set in your `.vimrc.bundles.fork` file.
 You can specify the default bundles for your fork using `.vimrc.before.fork` file. Here is how to create an example `.vimrc.before.fork` file 
 in a fork repo for the default bundles.
 ```bash
-    echo let g:spf13_bundle_groups=['general', 'programming', 'misc', 'youcompleteme'] >> .vimrc.before.fork
+    echo let g:spf13_bundle_groups=[\'general\', \'programming\', \'misc\', \'youcompleteme\'] >> .vimrc.before.fork
 ```
 Once you have this file in your repo, only the bundles you specified will be installed during the first installation of your fork.
 
@@ -213,10 +210,16 @@ spf13-vim contains a curated set of popular vim plugins, colors, snippets and sy
 
 Create `~/.vimrc.bundles.local` for any additional bundles.
 
-To add a new bundle
+To add a new bundle, just add one line for each bundle you want to install. The line should start with the word "Bundle" followed by a string of either the vim.org project name or the githubusername/githubprojectname. For example, the github project [spf13/vim-colors](https://github.com/spf13/vim-colors) can be added with the following command
 
 ```bash
     echo Bundle \'spf13/vim-colors\' >> ~/.vimrc.bundles.local
+```
+
+Once new plugins are added, they have to be installed.
+
+```bash
+    vim +BundleInstall! +BundleClean +q
 ```
 
 ## Removing (disabling) an included plugin
@@ -510,7 +513,7 @@ Here's some tips if you've never used VIM before:
 [Vim]:http://www.vim.org/download.php#pc
 [msysgit]:http://code.google.com/p/msysgit
 [Chocolatey]: http://chocolatey.org/
-[spf13.vim package]: http://chocolatey.org/packages/spf13.vim
+[spf13-vim package]: https://chocolatey.org/packages/spf13-vim
 [MacVim]:http://code.google.com/p/macvim/
 [spf13-vim]:https://github.com/spf13/spf13-vim
 [contributors]:https://github.com/spf13/spf13-vim/contributors
