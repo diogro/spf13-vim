@@ -62,7 +62,7 @@
     " Add an UnBundle command {
     function! UnBundle(arg, ...)
       let bundle = vundle#config#init_bundle(a:arg, a:000)
-      call filter(g:bundles, 'v:val["name_spec"] != "' . a:arg . '"')
+      call filter(g:vundle#bundles, 'v:val["name_spec"] != "' . a:arg . '"')
     endfunction
 
     com! -nargs=+         UnBundle
@@ -279,7 +279,7 @@
 
     " Misc {
         if count(g:spf13_bundle_groups, 'misc')
-            Bundle 'wting/rust.vim'
+            Bundle 'rust-lang/rust.vim'
             Bundle 'tpope/vim-markdown'
             Bundle 'spf13/vim-preview'
             Bundle 'tpope/vim-cucumber'
