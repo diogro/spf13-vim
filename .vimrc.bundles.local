@@ -13,3 +13,5 @@ Bundle 'wellle/tmux-complete.vim'
 Bundle 'tpope/vim-vinegar'
 Bundle 'idbrii/vim-endoscope'
 Bundle 'chrisbra/vim-diff-enhanced'
+Bundle 'jalvesaq/R-Vim-runtime'
+
