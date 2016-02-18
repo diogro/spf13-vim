@@ -1,3 +1,6 @@
+if !exists("g:bundles")
+    let g:bundles = g:vundle#bundles
+endif
 UnBundle 'spf13/vim-autoclose'
 
 colorscheme ir_black
@@ -17,7 +20,7 @@ let r_syntax_folding = 1
 set nofoldenable
 
 "vim-r-em tudo!"
-source /home/diogro/.vim/bundle/Vim-R-plugin/r-plugin/global_r_plugin.vim
+"source /home/diogro/.vim/bundle/Vim-R-plugin/r-plugin/global_r_plugin.vim
 
 "Testando usar o espaço pra mandar as paradas
 vmap <Space> <Plug>RDSendSelection
