@@ -25,6 +25,8 @@ set nofoldenable
 "Testando usar o espaço pra mandar as paradas
 vmap <Space> <Plug>RDSendSelection
 nmap <Space> <Plug>RDSendLine
+let R_vsplit = 1
+let R_assign = 2
 
 " No spell a não ser que seja latex
 set nospell
