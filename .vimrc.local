@@ -3,7 +3,19 @@ if !exists("g:bundles")
 endif
 UnBundle 'spf13/vim-autoclose'
 
+"Colors
 colorscheme ir_black
+
+"line wrap
+set tw=79
+set wm=2
+set wrap linebreak nolist
+
+"pandoc syntax
+augroup pandoc_syntax
+    au! BufNewFile,BufFilePRe,BufRead *.md, *.mdk set filetype=markdown.pandoc
+augroup END
+
 
 " Centralizando a tela..."
 nmap <space> zz
