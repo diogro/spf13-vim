@@ -1,4 +1,6 @@
 all:
+	ln -sf ~/.vim $XDG_CONFIG_HOME/nvim
+	ln -sf ~/.spf13-vim-3/.vimrc $XDG_CONFIG_HOME/nvim/init.vim
 	ln -sf ~/.spf13-vim-3/.vim/ ~/.vim
 	ln -sf ~/.spf13-vim-3/.vimrc ~/.vimrc
 	ln -sf ~/.spf13-vim-3/.vimrc.local ~/.vimrc.local

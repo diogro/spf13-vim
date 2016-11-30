@@ -11,6 +11,12 @@ set tw=79
 set wm=2
 set wrap linebreak nolist
 
+"indent
+filetype plugin indent on
+syntax on
+let anyfold_activate=1
+set foldlevel=0
+
 "pandoc syntax
 augroup pandoc_syntax
     au! BufNewFile,BufFilePRe,BufRead *.md, *.mdk set filetype=markdown.pandoc
@@ -24,9 +30,6 @@ nmap N Nzz
 
 "Desligando a merda do _  = <-"
 let vimrplugin_assign = 0
-
-"Folding do R"
-let r_syntax_folding = 1
 
 "Comeca com folds abertos"
 set nofoldenable
@@ -45,9 +48,6 @@ set nospell
 
 " Using Par for formatting"
 set formatprg=par\ -w72re
-
-" fold method padrão"
-set foldmethod=syntax
 
 " espaços virtuais
 set virtualedit=all
@@ -85,7 +85,7 @@ cmap ;\ \(\)<Left><Left>
 cmap ;; %s:::g<Left><Left><Left>
 
 " Path da bibliografia pro pandoc ter auto complete
-let g:pandoc_bibfiles = '/home/diogro/Dropbox/Mendeley/library.bib'
+let g:pandoc_bibfiles = '/home/diogro/Dropbox/labbio/bibtex/library_f1000.bib'
 
 " Path do language tool
 let g:languagetool_jar = '/home/diogro/.bin/languagetool/LanguageTool.jar'
