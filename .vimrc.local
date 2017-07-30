@@ -6,6 +6,8 @@ UnBundle 'spf13/vim-autoclose'
 "Colors
 colorscheme ir_black
 
+let TERM = "xterm-256color"
+
 "line wrap
 set tw=79
 set wm=2
@@ -40,8 +42,8 @@ set nofoldenable
 "Testando usar o espaço pra mandar as paradas
 vmap <Space> <Plug>RDSendSelection
 nmap <Space> <Plug>RDSendLine
-let R_vsplit = 1
 let R_assign = 2
+
 
 " No spell a não ser que seja latex
 set nospell
