@@ -16,7 +16,7 @@ set wrap linebreak nolist
 "indent
 filetype plugin indent on
 syntax on
-let anyfold_activate=1
+let AnyFoldActivate=1
 set foldlevel=0
 
 "pandoc syntax
